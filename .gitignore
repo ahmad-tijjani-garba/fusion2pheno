@@ -1,0 +1,18 @@
+# data, models and outputs are not tracked (archived separately)
+data/
+derived/
+models/
+results/
+cache/
+logs/
+tmp/
+external/
+.venv/
+__pycache__/
+*.pyc
+*.npz
+*.npy
+*.pt
+*.safetensors
+*.h5
+*.csv.gz

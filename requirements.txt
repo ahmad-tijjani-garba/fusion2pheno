@@ -1,0 +1,16 @@
+# Versions of the environment used for the paper (Python 3.12)
+torch==2.15.0
+transformers==5.23.0
+tokenizers==0.23.3
+scikit-learn==1.9.1
+pandas==3.1.1
+numpy==2.5.4
+scipy==1.18.1
+pyhmmer==0.12.3
+openpyxl==3.1.5
+tabulate==0.10.0
+# also needed for some steps (versions not pinned in the paper environment)
+peft          # LoRA probe
+sentencepiece # ProtT5 tokenizer
+matplotlib    # figures
+pillow        # figures
