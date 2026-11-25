@@ -14,3 +14,4 @@ peft          # LoRA probe
 sentencepiece # ProtT5 tokenizer
 matplotlib    # figures
 pillow        # figures
+pymupdf       # figures (renders the TikZ Figure 1 PDF)

@@ -16,7 +16,8 @@ All confidence intervals resample genes (Equation 2 of the paper); a two-level b
 ```
 src/       analysis code (Python and shell); every script starts with a docstring describing its inputs and outputs
 jobs/      Slurm job scripts used on the clusters (partitions and resources must be adapted)
-figures/   make_figures.py: draws Figures 1-5 and writes the plotted values
+figures/   make_figures.py: draws Figures 2-5, renders Figure 1 and writes the plotted values
+           tikz/Figure1.tex: Figure 1 (study design) in TikZ, with its compiled Figure1.pdf
 ```
 
 All paths are resolved in `src/f2p_root.py` from environment variables:
@@ -56,13 +57,15 @@ ESM-2 650M and FusOn-pLM are downloaded from Hugging Face on first use. FusOn-pL
 | Review analyses: stricter labels, missing-partner flags, paralogues, data-source split, reduced and stacked embeddings, probes of what embeddings encode, matched set, AUPRC, two-level bootstrap | 3.7, 3.11, 4.3, 4.4 | `round2_extra.py`, `source_split.py`, `round3_embed.py`, `round3b.py`, `matched_vs_source.py`, `matched_details.py` |
 | Paediatric known-driver challenge panel | 3.10, 4.5 | `make_rev_inputs.py`, `score_panel.py`, `score_panel_v2.py`, `fp_panel_rev.py`, `panel_pretrain_overlap.py`, `panel_partners.py`, `fusondb_paediatric_coverage.py` |
 | Gene-resampled intervals, length bins, provenance of reported numbers | 3.11 | `reanalysis.py`, `bootstrap_cis.py`, `reanalysis_length.py`, `provenance.py` |
-| Figures | — | `figures/make_figures.py` |
+| Figures | — | `figures/make_figures.py`, `figures/tikz/Figure1.tex` |
 
 Most scripts that train models were run as Slurm jobs; `jobs/rev_cpu.sbatch` and `jobs/rev_job.sbatch` run any command line, for example:
 
 ```bash
 sbatch -J v2 jobs/rev_cpu.sbatch "python -u train_v2.py --seeds $(seq -s ' ' 1 50) --subsets AB_all AB_nonRT"
 ```
+
+To rebuild Figure 1 after editing it, compile `figures/tikz/Figure1.tex` with any LaTeX engine (for example `tectonic Figure1.tex` or `pdflatex Figure1.tex`) and rerun `figures/make_figures.py`.
 
 ## Data
 

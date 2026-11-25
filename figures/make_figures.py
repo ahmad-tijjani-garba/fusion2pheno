@@ -4,7 +4,7 @@ Usage: python make_figures.py <results dir> <figures out dir> <plotted-data out 
 Each figure is saved as an RGB PNG at 600 dpi (FigureN.png); its exact plotted values go to
 <plotted-data out dir>/FigureN_data.csv.
 
-Fig 1: study design (schematic), placed in Methods, Study design.
+Fig 1: study design, drawn in TikZ (tikz/Figure1.tex) and rendered here from tikz/Figure1.pdf.
 Fig 2: AUROC by split with gene-resampled CIs (results/rev1/reanalysis/fp.csv).
 Fig 3: held-out genes on the FusionPath-style labels, every model of Table 3 (reanalysis/fp.csv and fpr.csv).
 Fig 4: gene-role-free labels: (A) AUROC per training set; (B) gain from adding each embedding to the shortcut features
@@ -95,47 +95,23 @@ def panel(ax, letter, x=-0.02):
     ax.text(x, 1.02, letter, transform=ax.transAxes, fontsize=10, fontweight="bold", color=INK, ha="right", va="bottom")
 
 
-# ------------------------------------------------------------------ Figure 1: study design
-stages = [
-    ("1", "Reproduction", "Labels derived from\npartner-gene annotations",
-     "Run FusionPath's public\npipeline and characterise\nits labels",
-     "9.4% vs 22.2% pathogenic;\n44 of 54 paediatric\ndrivers unlabelled"),
-    ("2", "Held-out splits", "Genes shared between\ntraining and test sets",
-     "Rows → sequences →\nfusion pairs → whole\ngenes held out",
-     "Gene names: 1.000 → 0.500;\npLM embeddings 0.68–0.78\non unseen genes"),
-    ("3", "Role-free labels", "Gene-role labels and\ndata source",
-     "Cancer evidence vs normal-\ntissue chimeras; both\nclasses from one source",
-     "Sequence origin alone: 0.94;\nadding embeddings:\nat most +0.044"),
-    ("4", "Paediatric panel", "Coverage of childhood\ncancer drivers",
-     "47 driver fusions and\n483 isoforms, scored\nunder both label sets",
-     "Gene-role labels: 20–34;\ngene-role-free: 43–45;\ngene names alone: 41"),
-]
-fig, ax = plt.subplots(figsize=(FULL, 3.15))
-ax.set_position([0.005, 0.0, 0.99, 1.0])
-ax.set_xlim(0, 100); ax.set_ylim(0, 52); ax.axis("off")
-w, gap, x0 = 23.0, 2.33, 0.0
-for i, (num, title, shortcut, design, result) in enumerate(stages):
-    x = x0 + i * (w + gap)
-    ax.add_patch(FancyBboxPatch((x, 5.0), w, 46.5, boxstyle="round,pad=0,rounding_size=1.0", fc=CARD, ec=CARD_EDGE, lw=0.6))
-    ax.add_patch(FancyBboxPatch((x, 44.0), w, 7.5, boxstyle="round,pad=0,rounding_size=1.0", fc=BLUE, ec=BLUE, lw=0))
-    ax.add_patch(plt.Rectangle((x, 44.0), w, 2.0, fc=BLUE, ec=BLUE, lw=0))
-    ax.text(x + 1.3, 47.6, f"{num}  {title}", fontsize=7.2, fontweight="bold", color="white", va="center")
-    ax.text(x + 1.3, 41.6, "SHORTCUT ADDRESSED", fontsize=5.0, color=MUTED, va="top", fontweight="bold")
-    ax.text(x + 1.3, 38.9, shortcut, fontsize=6.2, color=INK, va="top", linespacing=1.25)
-    ax.text(x + 1.3, 30.6, "DESIGN", fontsize=5.0, color=MUTED, va="top", fontweight="bold")
-    ax.text(x + 1.3, 27.9, design, fontsize=6.2, color=INK2, va="top", linespacing=1.25)
-    ax.plot([x + 1.3, x + w - 1.3], [17.0, 17.0], color=CARD_EDGE, lw=0.5)
-    ax.text(x + 1.3, 15.6, "KEY RESULT", fontsize=5.0, color=MUTED, va="top", fontweight="bold")
-    ax.text(x + 1.3, 12.9, result, fontsize=6.2, color=BLUE, va="top", linespacing=1.25, fontweight="bold")
-    if i < 3:
-        ax.add_patch(FancyArrowPatch((x + w + 0.25, 28.0), (x + w + gap - 0.25, 28.0), arrowstyle="-|>",
-                                     mutation_scale=6, color=MUTED, lw=0.8))
-ax.text(50, 1.8, "At every stage, pLM-based models are compared with baselines that see only the shortcut:\n"
-        "gene names, gene roles, protein length, genomic layout and data source", fontsize=6.2, color=INK2,
-        ha="center", va="center", linespacing=1.3)
-save(fig, "Figure1")
-pd.DataFrame([{"stage": f"{s[0]} {s[1]}", "shortcut_addressed": s[2].replace("\n", " "), "design": s[3].replace("\n", " "),
-               "result_shown": s[4].replace("\n", "; ")} for s in stages]).to_csv(PLOT / "Figure1_data.csv", index=False)
+# ------------------------------------------------------------------ Figure 1: study design (TikZ)
+# Figure 1 is drawn in TikZ (tikz/Figure1.tex next to this script, compiled to tikz/Figure1.pdf). Here its PDF is
+# rendered to a 600-dpi RGB PNG; if the PDF is missing, Figure1.png is not written.
+TIKZ_PDF = Path(__file__).resolve().parent / "tikz" / "Figure1.pdf"
+if TIKZ_PDF.exists():
+    import pymupdf  # noqa: E402
+    page = pymupdf.open(TIKZ_PDF)[0]
+    page.get_pixmap(dpi=DPI, alpha=False).save(OUT / "Figure1.png")
+    from PIL import Image  # noqa: E402
+    Image.open(OUT / "Figure1.png").convert("RGB").save(OUT / "Figure1.png", dpi=(DPI, DPI))
+else:
+    print(f"note: {TIKZ_PDF} not found; compile tikz/Figure1.tex first", flush=True)
+stages = [("1", "Reproduction", "Run FusionPath's public pipeline and characterise its labels"),
+          ("2", "Held-out splits", "Remove overlap between training and test sets: rows, sequences, pairs, genes"),
+          ("3", "Role-free labels", "Cancer evidence vs normal-tissue chimeras; both classes from one source"),
+          ("4", "Known-driver panel", "Score 47 known paediatric driver fusions under both label sets")]
+pd.DataFrame([{"stage": f"{n} {t}", "design": d} for n, t, d in stages]).to_csv(PLOT / "Figure1_data.csv", index=False)
 
 # ------------------------------------------------------------------ Figure 2: AUROC by split
 b = pd.read_csv(REV / "reanalysis/fp.csv")
