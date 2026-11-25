@@ -107,10 +107,10 @@ if TIKZ_PDF.exists():
     Image.open(OUT / "Figure1.png").convert("RGB").save(OUT / "Figure1.png", dpi=(DPI, DPI))
 else:
     print(f"note: {TIKZ_PDF} not found; compile tikz/Figure1.tex first", flush=True)
-stages = [("1", "Reproduction", "Run FusionPath's public pipeline and characterise its labels"),
-          ("2", "Held-out splits", "Remove overlap between training and test sets: rows, sequences, pairs, genes"),
-          ("3", "Role-free labels", "Cancer evidence vs normal-tissue chimeras; both classes from one source"),
-          ("4", "Known-driver panel", "Score 47 known paediatric driver fusions under both label sets")]
+stages = [("1", "Reproduction", "Rebuild FusionPath and characterise its labels"),
+          ("2", "Held-out splits", "Rows -> sequences -> pairs -> genes"),
+          ("3", "Role-free labels", "Cancer evidence vs normal-tissue chimeras from one source"),
+          ("4", "Driver panel", "47 paediatric driver fusions scored under both label sets")]
 pd.DataFrame([{"stage": f"{n} {t}", "design": d} for n, t, d in stages]).to_csv(PLOT / "Figure1_data.csv", index=False)
 
 # ------------------------------------------------------------------ Figure 2: AUROC by split
